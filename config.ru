@@ -15,9 +15,9 @@ class App < Rack::App
     pull = params['pull_request']
 
     if params["action"] == 'labeled' && params['label']['name'] == 'Code Review'
-      assignees_count = 2 - pull['assignees'].size
+      assignees_count = 2 - pull['requested_reviewers'].size
 
-      return if assignees_count <= 0
+      return if requested_reviewers_count <= 0
 
       creator = pull.dig(*%w(user login))
       # teams_url = params.dig(*%w(repository teams_url))
@@ -28,12 +28,17 @@ class App < Rack::App
 
       logins = team_members.map { |m| m['login'] }
       logins.delete(creator)
-      assignees = logins.sample(assignees_count)
+      requested_reviewers = logins.sample(requested_reviewers_count)
 
-      HTTParty.post("#{pull['url'].gsub('pulls', 'issues')}/assignees",
-        body: { "assignees": assignees }.to_json,
+      HTTParty.post(
+        "#{pull['url'].gsub('pulls', 'issues')}/requested_reviewers",
+        body: { "reviewers": assignees }.to_json,
         basic_auth: { user: LOGIN, password: TOKEN },
-        headers: { 'User-Agent' => LOGIN } )
+        headers: {
+          'User-Agent' => LOGIN,
+          'Accept' => 'application/vnd.github.black-cat-preview+json'
+        }
+      )
     end
   end
 
