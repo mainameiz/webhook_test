@@ -31,7 +31,7 @@ class App < Rack::App
       requested_reviewers = logins.sample(requested_reviewers_count)
 
       HTTParty.post(
-        "#{pull['url'].gsub('pulls', 'issues')}/requested_reviewers",
+        "#{pull['url']}/requested_reviewers",
         body: { "reviewers": assignees }.to_json,
         basic_auth: { user: LOGIN, password: TOKEN },
         headers: {
