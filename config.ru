@@ -15,7 +15,7 @@ class App < Rack::App
     pull = params['pull_request']
 
     if params["action"] == 'labeled' && params['label']['name'] == 'Code Review'
-      assignees_count = 2 - pull['requested_reviewers'].size
+      requested_reviewers_count = 2 - pull['requested_reviewers'].size
 
       return if requested_reviewers_count <= 0
 
@@ -32,7 +32,7 @@ class App < Rack::App
 
       HTTParty.post(
         "#{pull['url']}/requested_reviewers",
-        body: { "reviewers": assignees }.to_json,
+        body: { "reviewers": requested_reviewers }.to_json,
         basic_auth: { user: LOGIN, password: TOKEN },
         headers: {
           'User-Agent' => LOGIN,
