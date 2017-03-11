@@ -26,7 +26,9 @@ class App < Rack::App
       reviewers = logins.sample(requested_reviewers_count)
 
       GithubWrapper.request_review(pull['url'], reviewers)
-      SlackWrapper.notify_reviewers(pull['url'], reviewers)
+
+      pull_url = pull['url'].gsub(/(api.|repos\/)/, '').gsub('pulls', 'issues')
+      SlackWrapper.notify_reviewers(pull_url, reviewers)
     end
   end
 
