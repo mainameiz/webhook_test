@@ -16,7 +16,7 @@ module SlackWrapper
   module_function
 
   def notify_reviewers(url, reviewers)
-    text = "#{BEGINNINGS.sample}: #{reviewers.map { |r| "@#{r}" }.join(' ')} #{url}"
+    text = "#{BEGINNINGS.sample} #{reviewers.join(' ')} #{url}"
 
     request = HTTParty.post(
         SLACK_URL,
