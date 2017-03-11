@@ -3,11 +3,10 @@ require 'httparty'
 require 'logger'
 require 'pry'
 
-require_relative 'request_review'
+require_relative 'github_wrapper'
 
 class App < Rack::App
 
-  TEAM_URL = ENV['TEAM_URL']
 
   desc 'assign_reviewers'
   post '/assign_reviewers' do
@@ -21,15 +20,11 @@ class App < Rack::App
 
       creator = pull.dig(*%w(user login))
 
-      team_members = JSON.parse(HTTParty.get(TEAM_URL,
-        basic_auth: { user: LOGIN, password: TOKEN },
-        headers: { 'User-Agent' => LOGIN }).body)
-
-      logins = team_members.map { |m| m['login'] }
+      logins = GithubWrapper.team_members.map { |m| m['login'] }
       logins.delete(creator)
       reviewers = logins.sample(requested_reviewers_count)
 
-      RequestReview.call(reviewers)
+      GithubWrapper.request_review(pull['url'], reviewers)
     end
   end
 
