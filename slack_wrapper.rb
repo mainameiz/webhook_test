@@ -5,31 +5,30 @@ module SlackWrapper
   BEGINNINGS = [
     'Review plz',
     'Review please',
-    'Посмотрите',
-    'Посмотрите пожалуйста',
-    'Гляньте',
-    'Поревьюйте',
-    '',
-    ':code_review:'
+    'Посмотри пожалуйста',
+    'Глянь пожалуйта',
+    ''
   ]
 
   module_function
 
   def notify_reviewers(url, reviewers)
-    text = "#{BEGINNINGS.sample} #{reviewers.join(' ')} #{url}"
+    text = "#{BEGINNINGS.sample} #{url}"
 
-    request = HTTParty.post(
+    requests = reviewers.map do |reviewer|
+      HTTParty.post(
         SLACK_URL,
         body: {
           payload: {
-            channel: '#review_me',
+            channel: "@#{reviewer}",
             username: 'webhookbot',
             text: text,
             icon_emoji: ':ghost:'
           }.to_json
         }
       )
+    end
 
-    request.success?
+    requests.all?(&:success?)
   end
 end
