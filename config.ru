@@ -25,6 +25,7 @@ class App < Rack::App
       reviewers = logins.sample(requested_reviewers_count)
 
       GithubWrapper.request_review(pull['url'], reviewers)
+      SlackWrapper.notify_reviewers(pull['url'], reviewers)
     end
   end
 
