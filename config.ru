@@ -4,6 +4,7 @@ require 'logger'
 require 'pry'
 
 require_relative 'github_wrapper'
+require_relative 'slack_wrapper'
 
 class App < Rack::App
 
