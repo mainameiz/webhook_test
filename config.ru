@@ -3,10 +3,10 @@ require 'httparty'
 require 'logger'
 require 'pry'
 
+require_relative 'request_review'
+
 class App < Rack::App
 
-  LOGIN = ENV['GITHUB_LOGIN']
-  TOKEN = ENV['GITHUB_TOKEN']
   TEAM_URL = ENV['TEAM_URL']
 
   desc 'assign_reviewers'
@@ -20,7 +20,6 @@ class App < Rack::App
       return if requested_reviewers_count <= 0
 
       creator = pull.dig(*%w(user login))
-      # teams_url = params.dig(*%w(repository teams_url))
 
       team_members = JSON.parse(HTTParty.get(TEAM_URL,
         basic_auth: { user: LOGIN, password: TOKEN },
@@ -28,17 +27,9 @@ class App < Rack::App
 
       logins = team_members.map { |m| m['login'] }
       logins.delete(creator)
-      requested_reviewers = logins.sample(requested_reviewers_count)
+      reviewers = logins.sample(requested_reviewers_count)
 
-      HTTParty.post(
-        "#{pull['url']}/requested_reviewers",
-        body: { "reviewers": requested_reviewers }.to_json,
-        basic_auth: { user: LOGIN, password: TOKEN },
-        headers: {
-          'User-Agent' => LOGIN,
-          'Accept' => 'application/vnd.github.black-cat-preview+json'
-        }
-      )
+      RequestReview.call(reviewers)
     end
   end
 
