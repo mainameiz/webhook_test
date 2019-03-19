@@ -17,7 +17,7 @@ module GithubWrapper
         }
       )
 
-    request.success?
+    request
   end
 
   def team_members
