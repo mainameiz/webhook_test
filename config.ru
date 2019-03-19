@@ -14,6 +14,7 @@ class App < Rack::App
     params = JSON.parse(payload)
     pull = params['pull_request']
 
+    puts "label: #{params['label']['name']}" if params['action'] == 'labeled'
     if params["action"] == 'labeled' && params['label']['name'] == 'Code Review'
       requested_reviewers_count = REVIEWERS_COUNT - pull['requested_reviewers'].size
 
