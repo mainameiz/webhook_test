@@ -9,6 +9,7 @@ require_relative 'slack_wrapper'
 class App < Rack::App
   REVIEWERS_COUNT = ENV.key?('REVIEWERS_COUNT') ? ENV['REVIEWERS_COUNT'].to_i : 2
 
+  STDOUT.sync = true
   apply_extensions :logger
 
   desc 'assign_reviewers'
