@@ -34,12 +34,12 @@ class App < Rack::App
 
       github_response = GithubWrapper.request_review(pull['url'], reviewers)
       logger.info("github success: #{github_response.success?.inspect}")
+      logger.info("github success: #{github_response.body.inspect}")
       logger.info("github success: #{github_response.inspect}")
       logger.info("github code: #{github_response.code.inspect}")
       unless github_response.success?
         response.status = github_response.code
-        response.body = github_response.body
-        return
+        return github_response.body
       end
 
       pull_url = pull['url'].gsub(/(api.|repos\/)/, '').gsub('pulls', 'issues')
