@@ -30,8 +30,9 @@ class App < Rack::App
       logins = GithubWrapper.team_members.map { |m| m['login'] }
       logins.delete(creator)
       reviewers = logins.sample(requested_reviewers_count)
+      logger.info("reviewers: #{reviewers.inspect}")
 
-      GithubWrapper.request_review(pull['url'], reviewers)
+      logger.info("github success: #{GithubWrapper.request_review(pull['url'], reviewers).inspect}")
 
       pull_url = pull['url'].gsub(/(api.|repos\/)/, '').gsub('pulls', 'issues')
       SlackWrapper.notify_reviewers(pull_url, reviewers)
