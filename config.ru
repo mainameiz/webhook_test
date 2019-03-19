@@ -35,6 +35,7 @@ class App < Rack::App
       response = GithubWrapper.request_review(pull['url'], reviewers)
       logger.info("github success: #{response.success?.inspect}")
       logger.info("github success: #{response.inspect}")
+      return [response.code, {}, response.body] unless response.success?
 
       pull_url = pull['url'].gsub(/(api.|repos\/)/, '').gsub('pulls', 'issues')
       SlackWrapper.notify_reviewers(pull_url, reviewers)
