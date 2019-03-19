@@ -9,13 +9,16 @@ require_relative 'slack_wrapper'
 class App < Rack::App
   REVIEWERS_COUNT = ENV.key?('REVIEWERS_COUNT') ? ENV['REVIEWERS_COUNT'].to_i : 2
 
+  apply_extensions :logger
+
   desc 'assign_reviewers'
   post '/assign_reviewers' do
+    logger.info 'asdasd'
     params = JSON.parse(payload)
     pull = params['pull_request']
 
-    puts "action: #{params['action'].inspect}"
-    puts "label: #{params['label']['name'].inspect}" if params['action'] == 'labeled'
+    logger.info "action: #{params['action'].inspect}"
+    logger.info("label: #{params['label']['name'].inspect}") if params['action'] == 'labeled'
     if params["action"] == 'labeled' && params['label']['name'] == 'Code Review'
       requested_reviewers_count = REVIEWERS_COUNT - pull['requested_reviewers'].size
 
